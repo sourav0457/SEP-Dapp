@@ -56,7 +56,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="add-month-number" class="font-weight-bold">Request Winner per Category</label>
+              <label for="category-result-id" class="font-weight-bold">Request Winner per Category</label>
               <div class = "row">
                   <div class = "col-9">
                 <input type="number" id="category-result-id" class="form-control" placeholder="Category ID" min="1" max="12">
@@ -70,7 +70,7 @@
         </div>
         <!-- User -->
         <div class="col-md-9 border border-dark rounded pl-lg-3 py-lg-3 h-100">
-          <div class="row px-lg-2 align-self-center" id = "voting-container">
+          <div class="row px-lg-2 align-self-center justify-content-center" id = "voting-container">
             <!-- Academic Events -->
             <div class="col-md-3 border border-dark rounded pl-lg-3 py-lg-3">
                 <div class="text-center font-weight-bold pl-lg-3 py-lg-3">Academics Event</div>
@@ -245,18 +245,13 @@
           <div class="py-lg-2">
 
           <!-- Second row -->
-          <div class = "row px-lg-2 align-self-center">
-            <div class="col-md-7 pl-lg-3 py-lg-3">
-              <div class="text-center font-weight-bold pl-lg-3 py-lg-3 form-inline">Pick your Preferred month</div>
+          <div class = "row px-lg-2 justify-content-center">
+            <div class="text-center col-md-7 pl-lg-3 py-lg-3 justify-self-center">
+              <div class="text-center font-weight-bold pl-lg-3 py-lg-3">Pick your Preferred month</div>
                 <button type="button" class="btn btn-outline-primary">September</button>
                 <button type="button" class="btn btn-outline-primary">October</button>
                 <button type="button" class="btn btn-outline-primary">November</button>
                 <button type="button" class="btn btn-outline-primary">December</button>
-            </div>
-            <div class = "px-lg-2"></div>
-            <div class="col-md-2 pl-lg-3 py-lg-3">
-                <div class="text-center font-weight-bold pl-lg-3 py-lg-3 form-inline">Submit your vote here</div>
-                <button type="button" id = "vote" class="btn btn-primary">Vote</button>
             </div>
           </div>
         </div>

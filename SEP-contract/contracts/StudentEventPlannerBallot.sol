@@ -36,16 +36,11 @@ contract StudentEventPlannerBallot {
         _;
     }
     // To check if event ID is valid
-    // modifier validEvent(uint _eventId){
-    //     require(_eventId > 0 && _eventId <= eventCount, "Event ID is not valid");
-    //     _;
-    // }
-    modifier validEvent(uint[] memory _eventId){
-        for(uint index = 0; index < _eventId.length; index++){
-            require(_eventId[index] > 0 && _eventId[index] <= eventCount, "Event ID is not valid");
-        }
+    modifier validEvent(uint _eventId){
+        require(_eventId > 0 && _eventId <= eventCount, "Event ID is not valid");
         _;
     }
+
     modifier validMonth(uint _monthNumber){
         require(_monthNumber > 0 && _monthNumber <= 12, "Month is invalid");
         _;
@@ -76,20 +71,14 @@ contract StudentEventPlannerBallot {
         monthCount ++;
         months[monthCount] = Month(monthCount, _monthNumber, 0);
     }
-    // function voteEvent(uint _eventId) public validEvent(_eventId) {
-    //     // Check to see if the user has already voted under the category
-    //     require(!hasVoted[events[_eventId].categoryId][msg.sender], "User has already selected an event in this category");
-    //     hasVoted[events[_eventId].categoryId][msg.sender] = true;
-    //     events[_eventId].voteCount ++;
-    // }
-    function voteEvent(uint[] memory _eventId) public validEvent(_eventId) {
+
+    function voteEvent(uint _eventId) public validEvent(_eventId) {
         // Check to see if the user has already voted under the category
-        for(uint index = 0; index < _eventId.length; index++){
-            require(!hasVoted[events[_eventId[index]].categoryId][msg.sender], "User has already selected an event in this category");
-            hasVoted[events[_eventId[index]].categoryId][msg.sender] = true;
-            events[_eventId[index]].voteCount ++;
-        }
+        require(!hasVoted[events[_eventId].categoryId][msg.sender], "User has already selected an event in this category");
+        hasVoted[events[_eventId].categoryId][msg.sender] = true;
+        events[_eventId].voteCount ++;
     }
+
     function voteMonth(uint _monthId) public validMonthVote(_monthId) {
         require(!hasSelectedMonth[msg.sender], "User has already selected a month");
         hasSelectedMonth[msg.sender] = true;
@@ -110,6 +99,7 @@ contract StudentEventPlannerBallot {
         }
         assert(maxVotes >= 1);
     }
+
     function requestWinningMonth() public view onlyChairperson returns (uint _monthNumber) {
         uint maxVotes = 0;
         for(uint monthId = 1; monthId <= monthCount; monthId ++){

@@ -36,7 +36,7 @@ App = {
     App.contracts.vote.setProvider(App.web3Provider);
     
     // App.getChairperson();
-    // App.render();
+    App.render();
     return App.bindEvents();
   });
   },
@@ -46,10 +46,8 @@ App = {
     $(document).on('click', '#add-category-btn', function(){ var value = $('#add-category-name').val(); App.addNewCategory(value); });
     $(document).on('click', '#add-event-btn', function(){ var eventName = $('#add-event-name').val(); var categoryId = $('#category-id').val(); App.addNewEvent(eventName, categoryId); });
     $(document).on('click', '#add-month-btn', function(){ var monthValue = $('#add-month-number').val(); App.addNewMonth(monthValue); });
-    $(document).on('click', '#vote', App.castVote);
     $(document).on('click', '#get-winner', function(){ var categoryResultId = $('#category-result-id').val(); App.getWinner(categoryResultId);});
-    // $(document).on('click', '#win-count', App.handleWinner);
-    // $(document).on('click', '#register', function(){ var ad = $('#enter_address').val(); App.handleRegister(ad); });
+    $(document).on('click', '.btn-vote', App.handleVote)
   },
 
   populateAddress : function(){
@@ -153,6 +151,7 @@ App = {
       });
   },
 
+  
   render: function(){
     console.log("Inside Render Function");
     var fetchInstance;
@@ -196,9 +195,9 @@ App = {
                     console.log("Category Id: " + event[2].toNumber() + " Event Name:" + event[1] + " Event Id:" + event[0]);
                     var eventContent = '\
                     <div class="card pl-lg-3 bg-white mb-3" style="max-width: 20rem;">\
-                      <div class="card-body align-self-start">\
-                        <input class="form-check-input" type="radio" name="' + cid + '" value="' + event[0].toNumber() +'" checked>\
-                        <label class="form-check-label pl-lg-2" for="gridRadios1">' + event[1] + '</label>\
+                      <div class="card-body align-self-start" style="width: 100%">\
+                        <label class="form-check-label">' + event[1] + '</label>\
+                        <button type="button" style="float: right" class="btn btn-dark btn-vote align-self-right" data-id ='+ event[0].toNumber() +'>Vote</button>\
                       </div>\
                     </div>'
                     categoryTemplateContainer.append(eventContent);
@@ -231,66 +230,29 @@ App = {
     });
   },
 
-  castVote: function() {
+
+  handleVote: function(event) {
     var voteInstance;
-    var votedEvents = [];
-    web3.eth.getAccounts(function(error, accounts) {
+    event.preventDefault();
+    var proposalId = parseInt($(event.target).data('id'));
+    console.log("Selected Event is: " + proposalId);
+    web3.eth.getAccounts(function(error, accounts){
       var account = accounts[0];
       App.contracts.vote.deployed().then(function(instance){
         voteInstance = instance;
-        return voteInstance.categoryCount();
-      }).then(function(categoryCount){
-        for(var c=1; c <= categoryCount; c++){
-          voteInstance.categories(c).then(function(category) {
-            var cid = category[0].toNumber();
-            var eventSelected = $('input[name=' + cid + ']:checked').val();
-            votedEvents.push(parseInt(eventSelected, 10));
-          })
-          console.log(votedEvents);
-          // console.log(votedEvents[1]);
-        }
-        App.contracts.vote.deployed().then(function(votedInstance){
-          voteInstance = votedInstance;
-          console.log("Account Number:" + account);
-          return voteInstance.voteEvent(votedEvents, {from: account});
-        }).then(function(result, err){
-          if(result){
-            if(parseInt(result.receipt.status) == 1)
-              alert("Vote successfully casted")
-            else
-              alert("Could not cast vote due to revert")
+        return voteInstance.voteEvent(proposalId, {from: account});
+      }).then(function(result, error){
+        if(result){
+          console.log(result);
+          if(parseInt(result.receipt.status) == 1)
+              alert(account + " voting done successfully")
+              else
+              alert(account + " voting not done successfully due to revert")
           } else {
-              alert("Could not cast vote")
-          }
-        })
+              alert(account + " voting failed")
+        }
       })
     })
-  },
-
-  handleVote: function(event) {
-    event.preventDefault();
-    var proposalId = parseInt($(event.target).data('id'));
-    var voteInstance;
-
-    web3.eth.getAccounts(function(error, accounts) {
-      var account = accounts[0];
-
-      App.contracts.vote.deployed().then(function(instance) {
-        voteInstance = instance;
-
-        return voteInstance.vote(proposalId, {from: account});
-      }).then(function(result, err){
-            if(result){
-                console.log(result.receipt.status);
-                if(parseInt(result.receipt.status) == 1)
-                alert(account + " voting done successfully")
-                else
-                alert(account + " voting not done successfully due to revert")
-            } else {
-                alert(account + " voting failed")
-            }   
-        });
-    });
   },
 
   getWinner: function(categoryResultId) {
@@ -300,6 +262,7 @@ App = {
       console.log(categoryResultId);
       return resultInstance.requestWinningEvent(categoryResultId);
     }).then(function(value){
+      console.log(value);
       alert(value + " is the winner!!");
     })
   },
